@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<script src="./zmanim/zmanim_files/kosher-zmanim.js"></script>
+		<script src="./zmanim/zmanim_files/hebcal.noloc.js"></script>
+		<title>ספירת העומר</title>
+		<style>
+			* {
+				box-sizing: border-box;
+				width: 100%;
+				text-align: center;
+			}
+
+			html,
+			body {
+				height: 100%;
+				width: 100%;
+				margin: 0px;
+				font-size: 56px;
+				font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+				background-color: #0a8cff;
+				color: #fff;
+				/* based on actual display */
+				padding: 0.25rem;
+			}
+
+			main {
+				flex-grow: 1;
+				max-width: 75%;
+				line-height: 1.3;
+			}
+
+			#title {
+				margin-bottom: 2rem;
+				font-size: 1.33rem;
+				font-weight: 700;
+				color: #051791;
+			}
+
+			#day {
+				min-height: 2.6rem;
+				min-width: 90%;
+			}
+
+			#subTitles {
+				display: flex;
+				flex-direction: row;
+				justify-content: space-between;
+				margin-top: 1.5rem;
+				font-size: 0.7rem;
+				font-weight: 700;
+				line-height: 1.75;
+				letter-spacing: 1.3px;
+			}
+
+			#subTitles div {
+				width: 35%;
+			}
+
+			footer {
+				display: inline-block;
+				padding: 0.15rem 0.75rem;
+				background-color: rgba(5, 23, 145, 0.9);
+			}
+
+			#time {
+				text-align: end;
+			}
+
+			.flex {
+				height: 100%;
+				width: 100%;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+			}
+
+			.hebrew {
+				direction: rtl;
+				font-family: 'Calibri', 'david';
+			}
+
+			/* loading animation */
+			main #day,
+			main #subTitles div:nth-child(1n + 1) {
+				border-radius: 12px;
+				transition: all cubic-bezier(0.6, 0, 0.2, 1) 300ms;
+			}
+
+			main.loading #day,
+			main.loading #subTitles div:nth-child(1n + 1) {
+				background: #bbcbdd;
+				/* 98c0e6 */
+				background: linear-gradient(315deg, #bbcbdd 30%, #e9f2fc, #bbcbdd 55%);
+				background-size: 200% 100%;
+				box-shadow:
+					0 1px 3px rgba(0, 0, 0, 0.12),
+					0 1px 2px rgba(0, 0, 0, 0.24);
+				animation: shine 5s cubic-bezier(0.6, 0, 0.2, 1) 0ms infinite;
+				color: transparent;
+				user-select: none;
+			}
+
+			@keyframes shine {
+				100% {
+					background-position-x: -200%;
+					box-shadow: none;
+				}
+			}
+		</style>
+	</head>
+
+	<body class="flex">
+		<main class="flex hebrew loading">
+			<div id="title">ספירת העומר</div>
+			<div id="day">&nbsp;</div>
+			<div id="subTitles">
+				<div align="left">&nbsp;</div>
+				<div align="right">&nbsp;</div>
+			</div>
+		</main>
+
+		<footer>
+			<div id="time">&nbsp;</div>
+		</footer>
+
+		<script>
+			const firstNight = new Date('April 19, 2022 20:30:00'),
+				time = document.getElementById('time'),
+				mainContainer = document.getElementsByTagName('main')[0],
+				dayEl = document.getElementById('day'),
+				subTitles = document.getElementById('subTitles').children,
+				countings = [
+					{
+						count: 'הַיּוֹם יוֹם אֶחָד לָעֹֽמֶר',
+						other: 'חסד שבחסד',
+						date: 'טז בניסן'
+					},
+					{
+						other: 'גבורה שבחסד',
+						count: 'הַיּוֹם שְׁנֵי\nיָמִים לָעֹֽמֶר ',
+						date: 'יז בניסן'
+					},
+					{
+						other: 'תפארת שבחסד',
+						count: 'הַיּוֹם שְׁלֹשָׁה\nיָמִים לָעֹֽמֶר ',
+						date: 'יח בניסן'
+					},
+					{
+						other: 'נצח שבחסד',
+						count: 'הַיּוֹם אַרְבָּעָה\nיָמִים לָעֹֽמֶר',
+						date: 'יט בניסן'
+					},
+					{
+						other: 'הוד שבחסד',
+						count: 'הַיּוֹם חֲמִשָּׁה\nיָמִים לָעֹֽמֵר',
+						date: 'כ בניסן'
+					},
+					{
+						other: 'יסוד שבחסד',
+						count: 'הַיוֹם שִׁשָּׁה\nיָמִים לָעֹֽמֶר',
+						date: 'כא בניסן'
+					},
+					{
+						count: 'הַיּוֹם שִׁבְעָה יָמִים שֶׁהֵם שָׁבֽוּעַ אֶחָד לָעֹֽמֶר',
+						other: 'מלכות שבחסד',
+						date: 'כב בניסן'
+					},
+					{
+						count: 'הַיּוֹם שְׁמוֹנָה יָמִים שֶׁהֵם שָׁבֽוּעַ אֶחָד וְיוֹם אֶחָד לָעֹֽמֶר',
+						other: 'חסד שבגבורה',
+						date: 'כג בניסן'
+					},
+					{
+						count: 'הַיּוֹם תִּשְׁעָה יָמִים שֶׁהֵם שָׁבֽוּעַ אֶחָד וּשְׁנֵי\nיָמִים לָעֹֽמֶר',
+						other: 'גבורה שבגבורה',
+						date: 'כד בניסן'
+					},
+					{
+						count: 'הַיּוֹם עֲשָׂרָה יָמִים שֶׁהֵם שָׁבֽוּעַ אֶחָד וּשְׁלֹשָׁה\nיָמִים לָעֹֽמֶר',
+						other: 'תפארת שבגבורה',
+						date: 'כה בניסן'
+					},
+					{
+						count: 'הַיּוֹם אַחַד עָשָׂר יוֹם שֶׁהֵם שָׁבֽוּעַ אֶחָד וְאַרְבָּעָה\nיָמִים לָעֹֽמֶר',
+						other: 'נצח שבגבורה',
+						date: 'כו בניסן'
+					},
+					{
+						count:
+							'הַיּוֹם שְׁנֵים עָשָׂר יוֹם שֶׁהֵם שָׁבֽוּעַ אֶחָד וַחֲמִשָּׁה\nיָמִים לָעֹֽמֶר',
+						other: 'הוד שבגבורה',
+						date: 'כז בניסן'
+					},
+					{
+						count:
+							'הַיּוֹם שְׁלֹשָׁה עָשָׂר יוֹם שֶׁהֵם שָׁבֽוּעַ אֶחָד וְשִׁשָּׁה\nיָמִים לָעֹֽמֶר',
+						other: 'יסוד שבגבורה',
+						date: 'כח בניסן'
+					},
+					{
+						count: 'הַיּוֹם אַרְבָּעָה עָשָׂר יוֹם שֶׁהֵם שְׁנֵי שָׁבוּעוֹת לָעֹֽמֶר',
+						other: 'מלכות שבגבורה',
+						date: 'כט בניסן'
+					},
+					{
+						count: 'הַיּוֹם חֲמִשָּׁה עָשָׂר יוֹם שֶׁהֵם שְׁנֵי שָׁבוּעוֹת וְיוֹם אֶחָד לָעֹֽמֶר',
+						other: 'חסד שבתפארת',
+						date: "ל' בניסן, א' דראש חדש"
+					},
+					{
+						count:
+							'הַיּוֹם שִׁשָּׁה עָשָׂר יוֹם שֶׁהֵם שְׁנֵי שָׁבוּעוֹת וּשְׁנֵי\nיָמִים לָעֹֽמֶר',
+						other: 'גבורה שבתפארת',
+						date: "א' באייר, ב' דראש חדש"
+					},
+					{
+						count:
+							'הַיּוֹם שִׁבְעָה עָשָׂר יוֹם שֶׁהֵם שְׁנֵי שָׁבוּעוֹת וּשְׁלֹשָׁה\nיָמִים לָעֹֽמֶר',
+						other: 'תפארת שבתפארת',
+						date: "ב' באייר"
+					},
+					{
+						count:
+							'הַיּוֹם שְׁמוֹנָה עָשָׂר יוֹם שֶׁהֵם שְׁנֵי שָׁבוּעוֹת וְאַרְבָּעָה\nיָמִים לָעֹֽמֶר',
+						other: 'נצח שבתפארת',
+						date: "ג' באייר"
+					},
+					{
+						count:
+							'הַיּוֹם תִּשְׁעָה עָשָׂר יוֹם שֶׁהֵם שְׁנֵי שָׁבוּעוֹת וַחֲמִשָּׁה\nיָמִים לָעֹֽמֶר',
+						other: 'הוד שבתפארת',
+						date: "ד' באייר"
+					},
+					{
+						count: 'הַיּוֹם עֶשְׂרִים יוֹם שֶׁהֵם שְׁנֵי שָׁבוּעוֹת וְשִׁשָּׁה\nיָמִים לָעֹֽמֶר',
+						other: 'יסוד שבתפארת',
+						date: "ה' באייר"
+					},
+					{
+						count: 'הַיּוֹם אֶחָד וְעֶשְׂרִים יוֹם שֶׁהֵם שְׁלֹשָׁה שָׁבוּעוֹת לָעֹֽמֶר',
+						other: 'מלכות שבתפארת',
+						date: "ו' באייר"
+					},
+					{
+						count:
+							'הַיּוֹם שְׁנַֽיִם וְעֶשְׂרִים יוֹם שֶׁהֵם שְׁלֹשָׁה שָׁבוּעוֹת וְיוֹם אֶחָד לָעֹֽמֶר',
+						other: 'חסד שבנצח',
+						date: "ז' באייר"
+					},
+					{
+						count:
+							'הַיּוֹם שְׁלֹשָׁה וְעֶשְׂרִים יוֹם שֶׁהֵם שְׁלֹשָׁה שָׁבוּעוֹת וּשְׁנֵי\nיָמִים לָעֹֽמֶר',
+						other: 'גבורה שבנצח',
+						date: "ח' באייר"
+					},
+					{
+						count:
+							'הַיּוֹם אַרְבָּעָה וְעֶשְׂרִים יוֹם שֶׁהֵם שְׁלֹשָׁה שָׁבוּעוֹת וּשְׁלֹשָׁה\nיָמִים לָעֹֽמֶר',
+						other: 'תפארת שבנצח',
+						date: "ט' באייר"
+					},
+					{
+						count:
+							'הַיּוֹם חֲמִשָּׁה וְעֶשְׂרִים יוֹם שֶׁהֵם שְׁלֹשָׁה שָׁבוּעוֹת וְאַרְבָּעָה\nיָמִים לָעֹֽמֶר',
+						other: 'נצח שבנצח',
+						date: "י' באייר"
+					},
+					{
+						count:
+							'הַיּוֹם שִׁשָּׁה וְעֶשְׂרִים יוֹם שֶׁהֵם שְׁלֹשָׁה שָׁבוּעוֹת וַחֲמִשָּׁה\nיָמִים לָעֹֽמֶר',
+						other: 'הוד שבנצח',
+						date: 'יא באייר'
+					},
+					{
+						count:
+							'הַיּוֹם שִׁבְעָה וְעֶשְׂרִים יוֹם שֶׁהֵם שְׁלֹשָׁה שָׁבוּעוֹת וְשִׁשָּׁה\nיָמִים לָעֹֽמֶר',
+						other: 'יסוד שבנצח',
+						date: 'יב באייר'
+					},
+					{
+						count: 'הַיּוֹם שְׁמוֹנָה וְעֶשְׂרִים יוֹם שֶׁהֵם אַרְבָּעָה שָׁבוּעוֹת לָעֹֽמֶר',
+						other: 'מלכות שבנצח',
+						date: 'יג באייר'
+					},
+					{
+						date: 'יד באייר ֽ‬ פסח שני',
+						other: 'חסד שבהוד',
+						count:
+							'הַיּוֹם תִּשְׁעָה וְעֶשְׂרִים יוֹם שֶׁהֵם אַרְבָּעָה שָׁבוּעוֹת וְיוֹם אֶחָד לָעֹֽמֶר'
+					},
+					{
+						count: 'הַיּוֹם שְׁלֹשִׁים יוֹם שֶׁהֵם אַרְבָּעָה שָׁבוּעוֹת וּשְׁנֵי\nיָמִים לָעֹֽמֶר',
+						other: 'גבורה שבהוד',
+						date: 'טו באייר'
+					},
+					{
+						count:
+							'הַיּוֹם אֶחָד וּשְׁלֹשִׁים יוֹם שֶׁהֵם אַרְבָּעָה שָׁבוּעוֹת וּשְׁלֹשָׁה\nיָמִים לָעֹֽמֶר',
+						other: 'תפארת שבהוד',
+						date: 'טז באייר'
+					},
+					{
+						count:
+							'הַיּוֹם שְׁנַֽיִם וּשְׁלֹשִׁים יוֹם שֶׁהֵם אַרְבָּעָה שָׁבוּעוֹת וְאַרְבָּעָה\nיָמִים לָעֹֽמֶר',
+						other: 'נצח שבהוד',
+						date: 'יז באייר'
+					},
+					{
+						count:
+							'הַיּוֹם שְׁלֹשָׁה וּשְלֹשִׁים יוֹם שֶׁהֵם אַרְבָּעָה שָׁבוּעוֹת וַחֲמִשָּׁה\nיָמִים לָעֹֽמֶר',
+						other: 'הוד שבהוד',
+						date: 'יח באייר ֽ‬ ל"ג בעומר'
+					},
+					{
+						count:
+							'הַיּוֹם אַרְבָּעָה וּשְׁלֹשִׁים יוֹם שֶׁהֵם אַרְבָּעָה שָׁבוּעוֹת וְשִׁשָּׁה\nיָמִים לָעֹֽמֶר',
+						other: 'יסוד שבהוד',
+						date: 'יט באייר'
+					},
+					{
+						count: 'הַיּוֹם חֲמִשָּׁה וּשְׁלֹשִׁים יוֹם שֶׁהֵם חֲמִשָּׁה שָׁבוּעוֹת לָעֹֽמֶר',
+						other: 'מלכות שבהוד',
+						date: 'כ באייר'
+					},
+					{
+						count:
+							'הַיּוֹם שִׁשָּׁה וּשְׁלֹשִׁים יוֹם שֶׁהֵם חֲמִשָּׁה שָׁבוּעוֹת וְיוֹם אֶחָד לָעֹֽמֶר',
+						other: 'חסד שביסוד',
+						date: 'כא באייר'
+					},
+					{
+						count:
+							'הַיּוֹם שִׁבְעָה וּשְׁלֹשִׁים יוֹם שֶׁהֵם חֲמִשָּׁה שָׁבוּעוֹת וּשְׁנֵי\nיָמִים לָעֹֽמֶר',
+						other: 'גבורה שביסוד',
+						date: 'כב באייר'
+					},
+					{
+						count:
+							'הַיּוֹם שְׁמוֹנָה וּשְׁלֹשִׁים יוֹם שֶׁהֵם חֲמִשָּׁה שָׁבוּעוֹת וּשְׁלֹשָׁה\nיָמִים לָעֹֽמֶר',
+						other: 'תפארת שביסוד',
+						date: 'כג באייר'
+					},
+					{
+						count:
+							'הַיּוֹם תִּשְׁעָה וּשְׁלֹשִׁים יוֹם שֶׁהֵם חֲמִשָּׁה שָׁבוּעוֹת וְאַרְבָּעָה\nיָמִים לָעֹֽמֶר',
+						other: 'נצח שביסוד',
+						date: 'כד באייר'
+					},
+					{
+						count:
+							'הַיּוֹם אַרְבָּעִים יוֹם שֶׁהֵם חֲמִשָּׁה שָׁבוּעוֹת וַחֲמִשָּׁה\nיָמִים לָעֹֽמֶר',
+						other: 'הוד שביסוד',
+						date: 'כה באייר'
+					},
+					{
+						count:
+							'הַיּוֹם אֶחָד וְאַרְבָּעִים יוֹם שֶׁהֵם חֲמִשָּׁה שָׁבוּעוֹת וְשִׁשָּׁה\nיָמִים לָעֹֽמֶר',
+						other: 'יסוד שביסוד',
+						date: 'כו באייר'
+					},
+					{
+						count: 'הַיּוֹם שְׁנַֽיִם וְאַרְבָּעִים יוֹם שֶׁהֵם שִׁשָּׁה שָׁבוּעוֹת לָעֹֽמֶר',
+						other: 'מלכות שביסוד',
+						date: 'כז באייר'
+					},
+					{
+						count:
+							'הַיּוֹם שְׁלֹשָׁה וְאַרְבָּעִים יוֹם שֶׁהֵם שִׁשָּׁה שָׁבוּעוֹת וְיוֹם אֶחָד לָעֹֽמֶר',
+						other: 'חסד שבמלכות',
+						date: 'כח באייר'
+					},
+					{
+						count:
+							'הַיּוֹם אַרְבָּעָה וְאַרְבָּעִים יוֹם שֶׁהֵם שִׁשָּׁה שָׁבוּעוֹת וּשְׁנֵי\nיָמִים לָעֹֽמֶר',
+						other: 'גבורה שבמלכות',
+						date: 'כט באייר'
+					},
+					{
+						count:
+							'הַיּוֹם חֲמִשָּׁה וְאַרְבָּעִים יוֹם שֶׁהֵם שִׁשָּׁה שָׁבוּעוֹת וּשְׁלֹשָׁה\nיָמִים לָעֹֽמֶר',
+						other: 'תפארת שבמלכות',
+						date: 'א בסיון, ליל ראש חדש'
+					},
+					{
+						count:
+							'הַיּוֹם שִׁשָּׁה וְאַרְבָּעִים יוֹם שֶׁהֵם שִׁשָּׁה שָׁבוּעוֹת וְאַרְבָּעָה\nיָמִים לָעֹֽמֶר',
+						other: 'נצח שבמלכות',
+						date: "ב' בסיון"
+					},
+					{
+						count:
+							'הַיּוֹם שִׁבְעָה וְאַרְבָּעִים יוֹם שֶׁהֵם שִׁשָּׁה שָבוּעוֹת וַחֲמִשָּׁה\nיָמִים לָעֹֽמֶר',
+						other: 'הוד שבמלכות',
+						date: "ג' בסיון"
+					},
+					{
+						count:
+							'הַיּוֹם שְׁמוֹנָה וְאַרְבָּעִים יוֹם שֶׁהֵם שִׁשָּׁה שָׁבוּעוֹת וְשִׁשָּׁה\nיָמִים לָעֹֽמֶר',
+						other: 'יסוד שבמלכות',
+						date: "ד' בסיון"
+					},
+					{
+						count: 'הַיּוֹם תִּשְׁעָה וְאַרְבָּעִים יוֹם שֶׁהֵם שִׁבְעָה שָׁבוּעוֹת לָעֹֽמֶר',
+						other: 'מלכות שבמלכות',
+						date: "ה' בסיון, ערב שבועות"
+					}
+				];
+
+			/* SET UP ALL LIBRARIES */
+			let options = {
+				date: new Date(),
+				locationName: 'Chestnut Ridge',
+				latitude: 41.081,
+				longitude: -74.045
+			};
+
+			// Import Hebcal
+			const hebcalDay = new Hebcal.HDate(options.date);
+			hebcalDay.setLocation(options.latitude, options.longitude);
+
+			let { shkiah, tzeit } = hebcalDay.getZemanim();
+			let omerCount = hebcalDay.omer();
+
+			// set the current time on screen
+			function displayClock() {
+				// set time into readable format
+				let now = new Date(),
+					hr = now.getHours() % 12 || 12,
+					min = now.getMinutes(),
+					meridian = now.getHours() < 12 ? 'AM' : 'PM';
+
+				if (min < 10) min = '0' + min;
+
+				// display time
+				time.innerText = `${hr}:${min} ${meridian}`;
+
+				// check if it's time to change the display
+				if (hr == 7 && min == 30 && meridian == 'PM') clearOmer();
+				else if (hr == 8 && min == 44 && meridian == 'PM') updateOmer();
+
+				// update every minute on zero seconds accurately
+				setTimeout(() => displayClock(), 60000 - (now.getSeconds() * 1000 + now.getMilliseconds()));
+				// update every second -> 1000-now.getMilliseconds()
+			}
+			// emtpy the screen from today's omer near shekiah
+			function clearOmer() {
+				mainContainer.classList.add('loading');
+			}
+			// update the omer on screen
+			function updateOmer() {
+				// calculate today's day in omer count
+				today = new Date();
+				diff = Math.floor((today.getTime() - firstNight.getTime()) / 86400000);
+
+				// kill update if it ran during shekiah
+				// if (today.getHours() == 19 && today.getMinutes() > 30 || today.getHours() == 20 && today.getMinutes() < 44) return
+
+				// fill in today's counting data
+				dayEl.innerText = countings[diff % countings.length].count;
+				subTitles[0].innerText = countings[(diff + 1) % countings.length].date;
+				subTitles[1].innerText = countings[diff % countings.length].other;
+				mainContainer.classList.remove('loading');
+			}
+
+			// startup clock and fill in current omer data
+			window.onload = function () {
+				// force fullscreen
+				if (document.documentElement.requestFullscreen)
+					document.documentElement.requestFullscreen();
+
+				displayClock();
+				setTimeout(() => updateOmer(), 2000);
+			};
+		</script>
+	</body>
+</html>
