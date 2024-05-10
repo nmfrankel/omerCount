@@ -3,5 +3,9 @@
 	import Clock from '../lib/Clock.svelte';
 </script>
 
+<svelte:head>
+	<title>ספירת העומר</title>
+</svelte:head>
+
 <CountContainer />
 <Clock />

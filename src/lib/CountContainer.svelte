@@ -1,41 +1,12 @@
 <script lang="ts">
-	import {
-		GeoLocation,
-		Zmanim,
-		HDate,
-		HebrewCalendar,
-		HebrewDateEvent,
-		OmerEvent,
-		Locale
-	} from '@hebcal/core';
+	import { options, tzeisOffset } from '$lib/index';
+	import { HDate, HebrewCalendar, HebrewDateEvent, OmerEvent, Locale } from '@hebcal/core';
 	import { onMount } from 'svelte';
 
-	let dayEl: HTMLDivElement, leftEl: HTMLDivElement, rightEl: HTMLDivElement;
-
-	function getTime(timestamp: Date) {
-		// const gloc = new GeoLocation(null, options.latitude, options.longitude, options.elevation, options.tzid);
-		// const zmanim = new Zmanim(gloc, options.date, false);
-		// const shkiah = zmanim.shkiah()
-		// const tzeit = zmanim.sunsetOffset(72)
-		// console.log(shkiah, tzeit)
-		/* tslint:disable-next-line */
-		// const hebcalDay = new Hebcal.HDate(options.date)
-		// hebcalDay.setLocation(options.latitude, options.longitude)
-		// let { shkiah, tzeit } = hebcalDay.getZemanim()
-		// let omerCount = hebcalDay.omer()
-		// console.log(omerCount)
-	}
+	let dayEl: HTMLDivElement, dateEl: HTMLDivElement, middosEl: HTMLDivElement;
+	let isLoading: boolean;
 
 	function setOmer() {
-		let options = {
-			// date: new Date('Jan 1 2024'),
-			date: new Date(),
-			tzid: 'America/New_York',
-			locationName: 'Brooklyn - Mesivta Veretzky',
-			latitude: 40.62,
-			longitude: -73.957,
-			elevation: 9
-		};
 		const today = new HDate(options.date);
 		const todays_date = new HebrewDateEvent(today);
 		const calendar_events = HebrewCalendar.calendar({
@@ -43,43 +14,56 @@
 			start: today,
 			end: today
 		});
-		const omerDay: number | undefined = calendar_events[0]?.omer;
 
-		// debugging
-		// debugging
-		console.log(calendar_events);
-		globalThis.calendar_events = calendar_events;
-		// debugging
-		// debugging
+		let display_date = todays_date.renderBrief('he');
+		let omerDay: number | undefined;
 
-		if (omerDay) {
-			const omer = new OmerEvent(today, omerDay).getTodayIs('he');
-			const middos = new OmerEvent(today, omerDay).sefira('he');
+		// handle multiple calendar_events
+		for (const event of calendar_events) {
+			if (event.getCategories()[0] === 'roshchodesh') {
+				display_date += `, ${event.renderBrief('he')}`;
+			} else if (event.getCategories()[0] === 'omer') {
+				// @ts-ignore: Prperty missing on Event type
+				omerDay = event.omer;
+			}
+		}
+
+		// whether past tzeis to show tomorrow's count or during shkiah and none at all
+		const shkiahIndex = tzeisOffset();
+
+		if (!omerDay || omerDay + shkiahIndex >= 50) {
+			dayEl.innerText = '[No count today]';
+			dateEl.innerHTML = '&nbsp;';
+			middosEl.innerHTML = '&nbsp;';
+			isLoading = false;
+		} else if (shkiahIndex === -1) {
+			dayEl.innerHTML = '&nbsp;';
+			dateEl.innerHTML = '&nbsp;';
+			middosEl.innerHTML = '&nbsp;';
+			isLoading = true;
+		} else {
+			const omer = new OmerEvent(today, omerDay + shkiahIndex).getTodayIs('he');
+			const middos = new OmerEvent(today, omerDay + shkiahIndex).sefira('he');
 
 			dayEl.innerText = omer.replace(',', '\n');
-			leftEl.innerText = Locale.hebrewStripNikkud(todays_date.renderBrief('he'));
-			rightEl.innerText = Locale.hebrewStripNikkud(middos);
-		} else {
-			// add loading animation
-			dayEl.innerText = 'Loading...';
-			leftEl.innerHTML = '&nbsp;';
-			rightEl.innerHTML = '&nbsp;';
+			dateEl.innerText = Locale.hebrewStripNikkud(display_date);
+			middosEl.innerText = Locale.hebrewStripNikkud(middos);
+			isLoading = false;
 		}
+
+		// Update every minute
+		setTimeout(() => setOmer(), 60000);
 	}
 
-	// check if it's time to change the display
-	// if (hr == 7 && min == 30 && meridian == 'PM') clearOmer()
-	// else if (hr == 8 && min == 44 && meridian == 'PM') updateOmer()
-
-	onMount(() => setOmer());
+	onMount(() => setTimeout(() => setOmer(), 2000));
 </script>
 
 <div class="container column">
 	<div id="title">ספירת העומר</div>
-	<div id="day" bind:this={dayEl}>&nbsp;</div>
+	<div id="day" class:isLoading bind:this={dayEl}>&nbsp;</div>
 	<div id="metadata" class="row">
-		<div id="right" bind:this={rightEl}>&nbsp;</div>
-		<div id="left" bind:this={leftEl}>&nbsp;</div>
+		<div class:isLoading bind:this={middosEl}>&nbsp;</div>
+		<div class:isLoading bind:this={dateEl}>&nbsp;</div>
 	</div>
 </div>
 
@@ -97,6 +81,8 @@
 	#day {
 		min-height: 2.6rem;
 		min-width: 90%;
+		border-radius: 12px;
+		transition: all cubic-bezier(0.6, 0, 0.2, 1) 300ms;
 	}
 	#metadata {
 		height: unset;
@@ -111,5 +97,28 @@
 	#metadata div {
 		width: fit-content;
 		text-align: center;
+		border-radius: 12px;
+		transition: all cubic-bezier(0.6, 0, 0.2, 1) 300ms;
+	}
+
+	.isLoading {
+		background: #bbcbdd;
+		/* 98c0e6 */
+		background: linear-gradient(315deg, #bbcbdd 30%, #e9f2fc, #bbcbdd 55%);
+		background-size: 200% 100%;
+		box-shadow:
+			0 1px 3px rgba(0, 0, 0, 0.12),
+			0 1px 2px rgba(0, 0, 0, 0.24);
+		min-width: 40%;
+		animation: shine 5s cubic-bezier(0.6, 0, 0.2, 1) 0ms infinite;
+		color: transparent;
+		user-select: none;
+	}
+
+	@keyframes shine {
+		100% {
+			background-position-x: -200%;
+			box-shadow: none;
+		}
 	}
 </style>
