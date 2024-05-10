@@ -3,8 +3,7 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<script src="./zmanim/zmanim_files/kosher-zmanim.js"></script>
-		<script src="./zmanim/zmanim_files/hebcal.noloc.js"></script>
+		<script src="./hebcal.noloc.js"></script>
 		<title>ספירת העומר</title>
 		<style>
 			* {
@@ -457,11 +456,15 @@
 				diff = Math.floor((today.getTime() - firstNight.getTime()) / 86400000);
 
 				// kill update if it ran during shekiah
-				// if (today.getHours() == 19 && today.getMinutes() > 30 || today.getHours() == 20 && today.getMinutes() < 44) return
+				if (
+					(today.getHours() == 19 && today.getMinutes() > 30) ||
+					(today.getHours() == 20 && today.getMinutes() < 44)
+				)
+					return;
 
 				// fill in today's counting data
 				dayEl.innerText = countings[diff % countings.length].count;
-				subTitles[0].innerText = countings[(diff + 1) % countings.length].date;
+				subTitles[0].innerText = countings[diff % countings.length].date;
 				subTitles[1].innerText = countings[diff % countings.length].other;
 				mainContainer.classList.remove('loading');
 			}
