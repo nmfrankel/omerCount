@@ -4,7 +4,7 @@
 	import { onMount } from 'svelte';
 
 	let dayEl: HTMLDivElement, dateEl: HTMLDivElement, middosEl: HTMLDivElement;
-	let isLoading: boolean;
+	let isLoading = true;
 
 	function setOmer() {
 		const today = new HDate(options.date);
