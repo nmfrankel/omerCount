@@ -10,7 +10,7 @@
 		// whether past tzeis to show tomorrow's count or during shkiah and none at all
 		const isPastShkiah = tzeisOffset();
 
-		const today = new HDate(options.date).add(isPastShkiah === 1? 1: 0, 'day');
+		const today = new HDate(options.date).add(isPastShkiah === 1 ? 1 : 0, 'day');
 		const todays_date = new HebrewDateEvent(today);
 		const calendar_events = HebrewCalendar.calendar({
 			omer: true,
@@ -36,7 +36,7 @@
 			dateEl.innerHTML = '&nbsp;';
 			middosEl.innerHTML = '&nbsp;';
 			isLoading = false;
-		} else if(isPastShkiah === -1) {
+		} else if (isPastShkiah === -1) {
 			dayEl.innerHTML = '&nbsp;';
 			dateEl.innerHTML = '&nbsp;';
 			middosEl.innerHTML = '&nbsp;';
