@@ -7,7 +7,10 @@
 	let isLoading = true;
 
 	function setOmer() {
-		const today = new HDate(options.date);
+		// whether past tzeis to show tomorrow's count or during shkiah and none at all
+		const isPastShkiah = tzeisOffset();
+
+		const today = new HDate(options.date).add(isPastShkiah === 1? 1: 0, 'day');
 		const todays_date = new HebrewDateEvent(today);
 		const calendar_events = HebrewCalendar.calendar({
 			omer: true,
@@ -28,22 +31,19 @@
 			}
 		}
 
-		// whether past tzeis to show tomorrow's count or during shkiah and none at all
-		const shkiahIndex = tzeisOffset();
-
-		if (!omerDay || omerDay + shkiahIndex >= 50) {
+		if (!omerDay || omerDay > 49) {
 			dayEl.innerText = '[No count today]';
 			dateEl.innerHTML = '&nbsp;';
 			middosEl.innerHTML = '&nbsp;';
 			isLoading = false;
-		} else if (shkiahIndex === -1) {
+		} else if(isPastShkiah === -1) {
 			dayEl.innerHTML = '&nbsp;';
 			dateEl.innerHTML = '&nbsp;';
 			middosEl.innerHTML = '&nbsp;';
 			isLoading = true;
 		} else {
-			const omer = new OmerEvent(today, omerDay + shkiahIndex).getTodayIs('he');
-			const middos = new OmerEvent(today, omerDay + shkiahIndex).sefira('he');
+			const omer = new OmerEvent(today, omerDay).getTodayIs('he');
+			const middos = new OmerEvent(today, omerDay).sefira('he');
 
 			dayEl.innerText = omer.replace(',', '\n');
 			dateEl.innerText = Locale.hebrewStripNikkud(display_date);

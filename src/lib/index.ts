@@ -12,6 +12,11 @@ export let options = {
 	tzid: 'America/New_York'
 };
 
+/**
+ * Calculates the tzeis (nightfall) offset based on the given options.
+ * @returns {number} Returns 0 if the current date is before shkiah (sunset),
+ * 1 if the current date is after tzeis (nightfall), and -1 otherwise.
+ */
 export function tzeisOffset() {
 	// refresh date
 	options.date = new Date();
