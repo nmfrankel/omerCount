@@ -39,10 +39,4 @@ export function tzeisOffset() {
 	} else {
 		return -1;
 	}
-
-	// if (options.date >= shkiah && options.date <= tzeis) {
-	// 	return true;
-	// } else {
-	// 	return false;
-	// }
 }

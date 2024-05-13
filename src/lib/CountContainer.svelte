@@ -37,7 +37,7 @@
 			middosEl.innerHTML = '&nbsp;';
 			isLoading = false;
 		} else if (isPastShkiah === -1) {
-			dayEl.innerHTML = '&nbsp;';
+			dayEl.innerHTML = 'Loading...';
 			dateEl.innerHTML = '&nbsp;';
 			middosEl.innerHTML = '&nbsp;';
 			isLoading = true;

@@ -3,6 +3,34 @@
 
 	let timeEl: HTMLDivElement;
 
+	function toggleFullscreen() {
+		const doc = window.document as any;
+		const docEl = doc.documentElement as any;
+
+		const requestFullScreen =
+			docEl.requestFullscreen ||
+			docEl.mozRequestFullScreen ||
+			docEl.webkitRequestFullScreen ||
+			docEl.msRequestFullscreen;
+
+		const exitFullScreen =
+			doc.exitFullscreen ||
+			doc.mozCancelFullScreen ||
+			doc.webkitExitFullscreen ||
+			doc.msExitFullscreen;
+
+		if (
+			!doc.fullscreenElement &&
+			!doc.mozFullScreenElement &&
+			!doc.webkitFullscreenElement &&
+			!doc.msFullscreenElement
+		) {
+			requestFullScreen.call(docEl);
+		} else {
+			exitFullScreen.call(doc);
+		}
+	}
+
 	function displayCurrentTime() {
 		const now = new Date();
 		let hours = now.getHours();
@@ -29,8 +57,10 @@
 	onMount(() => displayCurrentTime());
 </script>
 
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 <footer>
-	<div id="time" bind:this={timeEl}>&nbsp;</div>
+	<div id="time" bind:this={timeEl} on:click={toggleFullscreen}>&nbsp;</div>
 </footer>
 
 <style>
