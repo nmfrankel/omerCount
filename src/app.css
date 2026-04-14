@@ -6,8 +6,8 @@
 
 @font-face {
   font-family: 'Noa Shalev';
-  src: url('noa-shalev-regular.woff2') format('woff2'),
-  	url('noa-shalev-regular.woff') format('woff');
+  src: url('/noa-shalev-regular.woff2') format('woff2'),
+  	url('/noa-shalev-regular.woff') format('woff');
   font-weight: normal;
   font-style: normal;
   font-display: swap;

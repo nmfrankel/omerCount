@@ -31,6 +31,6 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@hebcal/core": "^5.3.8"
+		"@hebcal/core": "^6.3.0"
 	}
 }
