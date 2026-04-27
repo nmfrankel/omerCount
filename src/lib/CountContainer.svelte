@@ -32,7 +32,8 @@
 			date += `, ${omerEvent.renderBrief('he')}`;
 		}
 
-		count = omerEvent ? omerEvent.getTodayIs('he').replace(/\u05BD/g, '').replace(',', '\n').replace(' ו', '\n ו') : 'Loading...';
+		console.log(omerEvent.getTodayIs('he').replace(',', ''));
+		count = omerEvent ? omerEvent.getTodayIs('he').replace(/\u05BD/g, '').replace(',', '').replace('שֶׁהֵם', '\nשֶׁהֵם').replace(/\s(ו\S{0,15}\s\S{0,15}\sלָעוֹמֶר)/, '\n$1') : 'Loading...';
 		middos = omerEvent ? omerEvent.sefira('he') : '\u{A0}';
 		anaBekoach = omerEvent?.getAnaBekoachWord() || '\u{A0}';
 		lamnatzeachWord = omerEvent?.getLamnatzeachWord() || '\u{A0}';
@@ -47,7 +48,7 @@
 		if (isPastShkiah === -1) {
 			isLoading = true;
 			return;
-		}		
+		}
 		isLoading = false;
 	}
 
@@ -78,8 +79,9 @@
 		flex-grow: 1;
 		font-size: 92px;
 		line-height: 1.3;
-		/* max-width: 60%; */
-		white-space: pre-wrap;
+		/* max-width: 92%; */
+		/* background-color: #0b81e9; */
+		white-space: pre-line;
 		border-radius: 12px;
 		transition: all cubic-bezier(0.6, 0, 0.2, 1) 300ms;
 	}
